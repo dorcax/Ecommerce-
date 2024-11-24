@@ -35,11 +35,12 @@ export class AuthController {
   }
 
 
-  
+
   @Roles(Role.USER)
   @UseGuards(JwtAuthGuard,RolesGuard)
   @Get('profile')
   getProfile(@Request() req) {
+    console.log(req.user)
     return req.user;
   }
   findAll() {
