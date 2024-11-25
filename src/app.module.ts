@@ -7,13 +7,15 @@ import { ProductModule } from './product/product.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { PrismaService } from './prisma.service';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 
 @Module({
-  imports: [AuthModule, UserModule, ProductModule, CartModule, OrderModule,
+  imports: [AuthModule, UserModule, ProductModule, CartModule, OrderModule, CloudinaryModule,
    
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CloudinaryService],
 })
 export class AppModule {}
