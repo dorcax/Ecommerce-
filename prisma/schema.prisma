@@ -107,6 +107,8 @@ enum Role {
 
 enum Status {
   PENDING
-  COMPLETED
+  PROCESSING
+  SHIPPING
+  DELIVERED
   CANCELLED
 }
