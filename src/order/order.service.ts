@@ -86,7 +86,7 @@ export class OrderService {
         }
       })
       if(!order){
-        throw new NotFoundException("order id not found")
+        throw new NotFoundException("Order not found for the given user ID")
       }
       // update the order status
       const updateOrder =await this.prisma.order.update({
@@ -94,7 +94,7 @@ export class OrderService {
           id:order.id
         },
         data:{
-          // status:dto.status
+          status:dto.status
         }
       })
     } catch (error) {

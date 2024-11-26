@@ -27,9 +27,8 @@ export class OrderStatusDto{
 
 
 export enum OrderStatus{
-PENDING="pending",
-PROCESSING="processing",
-SHIPPING="shippng",
-DELIVERED ="delivered",
-CANCELLED="cancelled"
+    PENDING = 'PENDING',
+    PROCESSING = 'PROCESSING',
+    SHIPPING = 'SHIPPING',
+    DELIVERED = 'DELIVERED',
 }
