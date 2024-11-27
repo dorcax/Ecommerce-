@@ -68,6 +68,23 @@ export class CartService {
 
   }
 
+  // get all cartwith userId 
+
+  async findCart(userId:string){
+    try {
+      const cart =await this.prisma.cart.findUnique({
+        where:{
+          userId:userId
+        },
+        include:{
+          user:true
+        }
+      })
+      return cart
+    } catch (error) {
+      throw new NotFoundException(error.message||"cart not found ") 
+    }
+  }
 
   //remove cart 
  async removeCart (productId:string,userId:string){
