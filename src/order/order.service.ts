@@ -97,10 +97,58 @@ export class OrderService {
           status:dto.status
         }
       })
+      return updateOrder
     } catch (error) {
       throw new InternalServerErrorException(
         error.message || 'Failed to update the order status',
       );
+    }
+  }
+  // fetch order with userId
+
+  async fetchOrders(userId:string){
+    try {
+      
+      const orders =await this.prisma.order.findMany({
+        where:{
+          userId:userId
+        }
+        ,
+        include:{
+          orderProducts:true
+        }
+      })
+      if (!orders || orders.length === 0) {
+        throw new NotFoundException("No orders found for the given user ID");
+      }
+      return orders
+    } catch (error) {
+      throw new InternalServerErrorException(error.message ||"failed to fetch orders"
+       )
+    }
+
+  }
+  // fetch single order
+
+  async fetchOrder(userId:string,orderId:string){
+    try {
+      
+      const order =await this.prisma.order.findUnique({
+        where:{
+          id:orderId,
+          userId:userId
+        },
+        include:{
+          orderProducts:true
+        }
+      }) 
+      if(!order ){
+        throw new NotFoundException("Order not found for the given ID and user");
+      }
+      return order
+    } catch (error) {
+      throw new InternalServerErrorException(error.message ||"failed to fetch order "
+      )
     }
   }
 }
