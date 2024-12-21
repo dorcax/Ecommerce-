@@ -9,6 +9,7 @@ dotenv.config(); // Load environment variables from .env
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.useGlobalPipes(new ValidationPipe({
     transform: true, // This ensures transformations like @Transform are applied
     whitelist: true, // Remove fields not defined in DTO

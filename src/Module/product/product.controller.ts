@@ -12,6 +12,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Req
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateCategoryDto, CreateProductDto } from './dto/create-product.dto';
@@ -20,13 +21,15 @@ import { UpdateCategoryDto } from './dto/update-category';
 import { JwtAuthGuard } from '../auth/guards/jwt-guard';
 import { RolesGuard } from '../auth/guards/role-guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from 'src/auth/entities/role.entity';
+import { Role } from '../auth/entities/role.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
-
+  // create to product
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard,RolesGuard)
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   create(
@@ -39,14 +42,19 @@ export class ProductController {
       }),
     )
     file: Express.Multer.File,
-    @Body() createProductDto: CreateProductDto,
+    @Body() createProductDto: CreateProductDto ,
+    @Req() req
 
   ) {
-    return this.productService.createProduct(createProductDto,file);
+    const userId = req.user.sub;
+
+
+
+    return this.productService.createProduct(createProductDto,file,req);
   }
 
   // category route
-  @Roles(Role.USER)
+  @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('file'))
   @Post('category')
@@ -67,22 +75,36 @@ export class ProductController {
 
   // find all product
 
-  @Roles(Role.USER)
+  @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get(":userId")
-  async findProducts(@Param("userId") userId:string){
-    return this.productService.findProducts(userId);
+  @Get()
+  async findProducts(
+    @Req() req
+  ){
+    return this.productService.findProducts(req);
+  }
+  
+  // find each product 
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get(":productId")
+  getProduct(
+    @Param("productId") productId:string,
+    @Req() req
+  ){
+
+    const userId = req.user.payload.sub;
+    return this.productService.findProduct(productId,userId)
   }
 
   // find all category
-  @Roles(Role.USER)
+  @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get("allcategories")
+  @Get("category")
+
    findCategories(){
     return this.productService.findCategories();
   }
-
-
 
   // update product
   @Roles(Role.USER)

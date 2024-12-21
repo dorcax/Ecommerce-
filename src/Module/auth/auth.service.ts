@@ -10,7 +10,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from 'src/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/Module/user/user.service';
 import { access } from 'fs';
 import { JwtService } from '@nestjs/jwt';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -66,7 +66,7 @@ export class AuthService {
   // login user
 
   async login(user: any) {
-    const payload = { sub: user.id, email: user.email,role:user.role };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     return {
       access_token: this.jwt.sign(payload),
     };
@@ -76,15 +76,5 @@ export class AuthService {
     return `This action returns all auth`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
+ 
 }

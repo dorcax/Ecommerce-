@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { OrderService } from './order.service';
 import { CreateOrderDto, OrderStatusDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-guard';
-import { RolesGuard } from 'src/auth/guards/role-guard';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { Role } from 'src/auth/entities/role.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-guard';
+import { RolesGuard } from '../auth/guards/role-guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/entities/role.entity';
 
 @Controller('order')
 export class OrderController {
