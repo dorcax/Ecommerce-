@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   UploadedFile,
+
   BadRequestException
 } from '@nestjs/common';
 import { CreateCategoryDto, CreateProductDto } from './dto/create-product.dto';
@@ -10,7 +11,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateCategoryDto,  } from './dto/update-category';
 import { PrismaService } from 'src/prisma.service';
 import { CloudinaryService } from 'src/module/cloudinary/cloudinary.service';
-import { Express } from 'express';
+
 @Injectable()
 export class ProductService {
   constructor(
@@ -174,11 +175,11 @@ async findProducts(req) {
    }
 
 // edit product 
- async updateProduct(productId: string, dto: UpdateProductDto,file:Express.Multer.File) {
+ async updateProduct(productId: string, dto: UpdateProductDto,file:Express.Multer.File,req) {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
-          id: dto.userId,
+          id: req.user.payload.sub,
         },
       });
 
@@ -193,6 +194,23 @@ async findProducts(req) {
       if (!category) {
         throw new NotFoundException('category not found');
       }
+      // find the existing product 
+      const existingProduct =await this.prisma.product.findUnique({
+        where:{
+          id:productId
+          
+        }
+      })
+      console.log("existing",existingProduct)
+      // find previous image and delete
+      if(existingProduct.imageUrl && existingProduct.imageUrl !==dto.imageUrl){
+       const deletePreviousImage= await this.cloudinaryService.deleteFile(existingProduct.imageUrl)
+       console.log("deletefile",deletePreviousImage)
+       if(!deletePreviousImage){
+        throw new InternalServerErrorException("failed to delete previous image")
+       }
+      }
+     
       // image uploading
       let imageUrl =dto.imageUrl
       if (!imageUrl && file) {
@@ -200,6 +218,7 @@ async findProducts(req) {
           throw new InternalServerErrorException('Failed to upload image');
         });
         imageUrl = uploadResponse.secure_url;
+        console.log("rrrr",uploadResponse)
       }
 
       if (!imageUrl) {
@@ -219,7 +238,7 @@ async findProducts(req) {
           variant:dto.variant,
           user: {
             connect: {
-              id: dto.userId,
+              id: req.user.payload.sub,
             },
           },
           category: {
@@ -281,7 +300,21 @@ async findProducts(req) {
   }
 
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+//  delete product 
+async deleteProduct(productId:string,req){
+  try {
+    const product =await this.prisma.product.delete({
+    where:{
+      id:productId,
+      userId:req.user.payload.sub
+    }
+    })
+    if(!product){
+      throw new NotFoundException("error in deleting product")
+    }
+    return product
+  } catch (error) {
+    throw new InternalServerErrorException(error.message)
   }
+}
 }
