@@ -18,4 +18,16 @@ uploadFile(file:Express.Multer.File):Promise<cloudinaryResponse>{
         streamifier.createReadStream(file.buffer).pipe(upload)
     })
 }
+// delete file
+deleteFile(data:string):Promise<cloudinaryResponse>{
+    return new Promise<cloudinaryResponse>((resolve,reject)=>{
+         cloudinary.uploader.destroy(data,(error,result)=>{
+          if(error){
+            return reject(error) 
+          }
+          return resolve(result)
+         })
+    })
+   
+}
 }

@@ -122,8 +122,9 @@ export class ProductController {
     )
     file: Express.Multer.File,
      @Body() updateProductDto: UpdateProductDto,
+     @Req() req,
     @Param("productId") productId:string) {
-    return this.productService.updateProduct( productId,updateProductDto,file);
+    return this.productService.updateProduct( productId,updateProductDto,file,req);
   }
 
 
@@ -146,5 +147,12 @@ export class ProductController {
     @Param("categoryId") categoryId:string) {
     return this.productService.updateCategory( categoryId,updateCategoryDto,file);
   }
-
+// delete product
+@Roles(Role.USER)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Delete(":productId")
+async deleteProduct(@Param("productId") productId:string,
+@Req() req){
+  return this.productService.deleteProduct(productId,req)
+}
 }
