@@ -12,12 +12,11 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
-  Req
-} from '@nestjs/common';
+  Req,
+  Res} from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateCategoryDto, CreateProductDto } from './dto/create-product.dto';
+import {  CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { UpdateCategoryDto } from './dto/update-category';
 import { JwtAuthGuard } from '../auth/guards/jwt-guard';
 import { RolesGuard } from '../auth/guards/role-guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -54,25 +53,7 @@ export class ProductController {
   }
 
   // category route
-  @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseInterceptors(FileInterceptor('file'))
-  @Post('category')
-  createCategory(
-    @UploadedFile(
-      new ParseFilePipe({ 
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }),
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
-        ],
-      }),
-    )
-    file: Express.Multer.File,
-
-    @Body() createCategoryDto: CreateCategoryDto) {
-    return this.productService.createCategory(createCategoryDto,file);
-  }
-
+ 
   // find all product
 
   @Roles(Role.ADMIN)
@@ -97,14 +78,8 @@ export class ProductController {
     return this.productService.findProduct(productId,userId)
   }
 
-  // find all category
-  @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get("category")
+  
 
-   findCategories(){
-    return this.productService.findCategories();
-  }
 
   // update product
   @Roles(Role.USER)
@@ -128,25 +103,7 @@ export class ProductController {
   }
 
 
-  // update category 
-  @Roles(Role.USER)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Patch(':categoryId')
-  @UseInterceptors(FileInterceptor('file'))
-  updateCategory(
-    @UploadedFile(
-      new ParseFilePipe({ 
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }),
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
-        ],
-      }),
-    )
-    file: Express.Multer.File,
-     @Body() updateCategoryDto: UpdateCategoryDto,
-    @Param("categoryId") categoryId:string) {
-    return this.productService.updateCategory( categoryId,updateCategoryDto,file);
-  }
+ 
 // delete product
 @Roles(Role.USER)
 @UseGuards(JwtAuthGuard, RolesGuard)
