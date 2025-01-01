@@ -8,6 +8,7 @@ import { CartModule } from './Module/cart/cart.module';
 import { OrderModule } from './Module/order/order.module';
 import { PrismaService } from './prisma.service';
 import { CloudinaryModule } from './module/cloudinary/cloudinary.module';
+import { CategoryModule } from './module/category/category.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CloudinaryModule } from './module/cloudinary/cloudinary.module';
     CartModule,
     OrderModule,
     CloudinaryModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -43,11 +43,3 @@ export class CreateProductDto {
 
 
 
-export class CreateCategoryDto {
-  @IsString()
-  name: string;
-
-  @IsOptional() 
-  @IsString()
-  imageUrl?: string; 
-}
