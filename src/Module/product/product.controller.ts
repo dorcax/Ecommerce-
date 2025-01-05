@@ -82,8 +82,9 @@ export class ProductController {
 
 
   // update product
-  @Roles(Role.USER)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
   @Patch(':productId')
   @UseInterceptors(FileInterceptor('file'))
   update(
@@ -105,11 +106,21 @@ export class ProductController {
 
  
 // delete product
-@Roles(Role.USER)
-@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.USER,Role.ADMIN)
+@UseGuards(JwtAuthGuard)
+@UseGuards(RolesGuard)
 @Delete(":productId")
 async deleteProduct(@Param("productId") productId:string,
 @Req() req){
   return this.productService.deleteProduct(productId,req)
 }
+// get statistics
+@Roles(Role.ADMIN)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Get("/stat/statistics")
+async getStatistics(){
+  return this.productService.getStatistics()
+}
+// get monthly sales 
+// @Roles(Role.ADMIN)
 }

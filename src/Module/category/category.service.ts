@@ -51,6 +51,21 @@ export class CategoryService {
          throw new InternalServerErrorException("Database query failed");
        }
      }
+    //  get data 
+    async getCategory (categoryId:string){
+      try{
+      const category =await this.prisma.category.findUnique({
+        where:{
+          id:categoryId
+        }
+
+      })
+      return category
+      }catch(error){
+        console.error("Error fetching categories:", error);
+        throw new InternalServerErrorException("Database query failed");
+      }
+    }
 
   // update category
 
@@ -66,12 +81,27 @@ export class CategoryService {
         throw new NotFoundException('category not found');
       }
       // image uploading
+      const existingCategory =await this.prisma.category.findUnique({
+        where:{
+          id:categoryId
+        }
+      })
+
+      if(existingCategory.imageUrl && existingCategory.imageUrl !==dto.imageUrl){
+        const deletePreviousImage= await this.cloudinaryService.deleteFile(existingCategory.imageUrl)
+        console.log("deletefile",deletePreviousImage)
+        if(!deletePreviousImage){
+         throw new InternalServerErrorException("failed to delete previous image")
+        }
+      }
+      // uploading of image
       let imageUrl =dto.imageUrl
       if (!imageUrl && file) {
         const uploadResponse = await this.cloudinaryService.uploadFile(file).catch(() => {
           throw new InternalServerErrorException('Failed to upload image');
         });
         imageUrl = uploadResponse.secure_url;
+        console.log("rrrr",uploadResponse)
       }
 
       if (!imageUrl) {
@@ -83,6 +113,7 @@ export class CategoryService {
         },
         data:{
           name: dto.name,
+          description:dto.description,
           imageUrl,
         }
       })
