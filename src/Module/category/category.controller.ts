@@ -38,6 +38,13 @@ findCategories(){
   return this.categoryService.findCategory();
 }
 
+// find a particular category
+@Roles(Role.USER)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Get(':categoryId')
+getCategory(@Param('categoryId') categoryId: string) {
+ return this.categoryService.getCategory(categoryId);
+}
 
    // update category 
    @Roles(Role.USER)

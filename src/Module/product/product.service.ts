@@ -222,20 +222,84 @@ async findProducts(req) {
 
   
 //  delete product 
-async deleteProduct(productId:string,req){
+async deleteProduct(productId: string, req) {
   try {
-    const product =await this.prisma.product.delete({
-    where:{
-      id:productId,
-      userId:req.user.payload.sub
+    const product = await this.prisma.product.deleteMany({
+      where: {
+        AND: [
+          { id: productId },
+          { userId: req.user.payload.sub },
+        ],
+      },
+    });
+
+    if (product.count === 0) {
+      throw new NotFoundException('Error in deleting product. Product not found.');
     }
-    })
-    if(!product){
-      throw new NotFoundException("error in deleting product")
-    }
-    return product
+
+    return { message: 'Product deleted successfully' };
   } catch (error) {
-    throw new InternalServerErrorException(error.message)
+    throw new InternalServerErrorException(error.message || 'An error occurred while deleting the product');
+  }
+}
+
+// get statistics
+async getStatistics(){
+  try {
+    const today = new Date();
+    console.log(today)
+    const last7days =new Date(today)
+    console.log(last7days)
+    last7days.setDate(today.getDate() -7)
+    const totalProduct=await this.prisma.product.count()
+    const totalOrder =await this.prisma.order.count({
+      where:{
+        createdAt:{gte:last7days}
+      }
+    })
+    const totalUser =await this.prisma.user.count({
+      where :{
+        createdAt:{
+          gte:last7days
+        }
+      }
+    })
+    const totalCategory=await this.prisma.category.count()
+
+    return {
+      totalProduct,
+      totalOrder,
+    totalUser,
+    totalCategory
+    }
+  } catch (error) {
+    console.log(error)
+    throw new InternalServerErrorException(error);
+    
+  }
+}
+// getmonthlysales
+async getMonthlySales(){
+  try {
+   const getOrders =await this.prisma.order.findMany({
+    select:{
+      totalPrice:true,
+      createdAt:true
+    }
+   })
+  //  get the tot
+  const result =getOrders.reduce((acc,curr)=>{
+    const month = new Date(curr.createdAt).getMonth()+1
+    acc[month]=(acc[month] ||0)+curr.totalPrice
+    return acc
+  },{})
+  // Convert the result into an array of 12 months, filling missing months with 0
+  const monthlyData=Array(20).fill(0).map((_,index)=>result[index+1] ||0)
+  return monthlyData
+  } catch (error) {
+    console.error(error);
+    throw new InternalServerErrorException('Error fetching monthly sales data');
+    
   }
 }
 }
