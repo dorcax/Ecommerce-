@@ -10,7 +10,7 @@ export class RolesGuard implements CanActivate{
     constructor(private reflector: Reflector){}
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         // whatis the required role
-   const requiredRole = this.reflector.getAllAndOverride<Role[]>("role",[
+   const requiredRole = this.reflector.getAllAndOverride<Role[]>("roles",[
     context.getHandler(),
     context.getClass()
    ])
@@ -25,7 +25,7 @@ export class RolesGuard implements CanActivate{
           }
           // is at least one of the require roles a role that the user is making
         //   return  requiredRole.some((role)=>user.role.includes(role));
-          return requiredRole.some((role) => user.role.includes(role));
+          return requiredRole.some((role) => user.role ===role);
     }
 
 }

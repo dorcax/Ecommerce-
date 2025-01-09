@@ -39,7 +39,7 @@ findCategories(){
 }
 
 // find a particular category
-@Roles(Role.USER)
+@Roles(Role.ADMIN)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Get(':categoryId')
 getCategory(@Param('categoryId') categoryId: string) {
@@ -47,7 +47,7 @@ getCategory(@Param('categoryId') categoryId: string) {
 }
 
    // update category 
-   @Roles(Role.USER)
+   @Roles(Role.ADMIN)
    @UseGuards(JwtAuthGuard, RolesGuard)
    @Patch(':categoryId')
    @UseInterceptors(FileInterceptor('file'))
@@ -68,7 +68,7 @@ getCategory(@Param('categoryId') categoryId: string) {
 
 
 // delete category
-   @Roles(Role.USER)
+   @Roles(Role.ADMIN)
    @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':categoryId')
   remove(@Param('categoryId') categoryId: string) {

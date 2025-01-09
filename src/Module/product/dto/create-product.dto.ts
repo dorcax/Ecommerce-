@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsNumber, IsString, IsOptional, IsNotEmpty, IsInt,Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 export class CreateProductDto {
   @IsString()
@@ -41,5 +41,19 @@ export class CreateProductDto {
   imageUrl?: string;
 }
 
+// pagination dto
+export class PaginationDto{
+  @IsOptional()
+  @IsString()
+  page?:string
+
+  @IsOptional()
+  @IsString()
+  limit?:string
+  
+  @IsOptional()
+  @IsString()
+  search?:string
+}
 
 
