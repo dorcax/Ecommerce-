@@ -12,11 +12,19 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
 
-   @Roles(Role.USER)
+   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard,RolesGuard)
   @Post()
   create(@Body() createCartDto: CreateCartDto) {
     return this.cartService.createCart(createCartDto);
+  }
+
+  // get cart
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Get(":cartId")
+  getCart(@Param("cartId") cartId:string) {
+    return this.cartService.findCart(cartId);
   }
 
 

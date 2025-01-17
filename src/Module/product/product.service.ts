@@ -9,7 +9,7 @@ import { CreateProductDto, PaginationDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma.service';
 import { CloudinaryService } from 'src/module/cloudinary/cloudinary.service';
-import { Order } from '../order/entities/order.entity';
+
 
 @Injectable()
 export class ProductService {
@@ -21,6 +21,7 @@ export class ProductService {
   async createProduct(dto: CreateProductDto, file: Express.Multer.File, req) {
     try {
       console.log('user', req.user);
+      // find if user exist
       const user = await this.prisma.user.findUnique({
         where: {
           id: req.user.sub,
@@ -30,6 +31,7 @@ export class ProductService {
       if (!user) {
         throw new NotFoundException('user not found');
       }
+      // find if category exist
 
       const category = await this.prisma.category.findUnique({
         where: {
@@ -41,14 +43,14 @@ export class ProductService {
       }
       // image uploading
       let imageUrl = dto.imageUrl;
-      if (!imageUrl && !file) {
+      if ( !file) {
         throw new BadRequestException('please upload your image');
       }
       if (file) {
         const uploadResponse = await this.cloudinaryService.uploadFile(file);
         imageUrl = uploadResponse.secure_url;
       }
-
+// create new product
       const product = await this.prisma.product.create({
         data: {
           name: dto.name,
@@ -94,7 +96,9 @@ export class ProductService {
     const take=limits
     console.log(take,skip)
     try {
-      
+      // check if the search is a valid number 
+      const parsedSearch =search &&!isNaN(parseInt(search))?parseInt(search) :null
+      // find many product 
       const products = await this.prisma.product.findMany({
         where: {
           userId: req.user.sub,
@@ -102,8 +106,8 @@ export class ProductService {
             OR:[
              { name: { contains: search, mode: "insensitive" } },
             { description: { contains: search, mode: "insensitive" } },
-            { stock: { equals:parseInt( search)} },
-            { price: { equals: parseInt(search) } },
+             parsedSearch !== null ? { stock: { equals:parsedSearch} } :{},
+            parsedSearch !== null ?{ price: { equals: parsedSearch } }:{},
             
             ]
           }:{})

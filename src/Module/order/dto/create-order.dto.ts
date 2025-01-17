@@ -21,6 +21,7 @@ export class CreateOrderDto {
 
 export class OrderStatusDto{
     status:OrderStatus
+   
 }
 
 

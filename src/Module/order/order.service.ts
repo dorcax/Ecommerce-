@@ -8,68 +8,40 @@ export class OrderService {
   constructor(private prisma:PrismaService){}
   async createOrder({userId,quantity,productId,totalPrice}: CreateOrderDto) {
     try {
-      // find the an order exist 
-      const order= await this.prisma.order.findFirst({
+      // find the price of the product 
+      const product=await this.prisma.product.findUnique({
         where:{
-          userId
-        },include:{
-          orderProducts:true
+         id: userId
+        },
+        select:{
+          price:true
         }
-
       })
-      if(!order){
-        // create new order 
+      if (!product) {
+        throw new NotFoundException('Product not found for the given product ID');
+      }
+      const total =product.price*quantity
+       // create new order 
         const newOrder =await this.prisma.order.create({
           data:{
-            totalPrice,
+            totalPrice:total,
             user:{
               connect:{
                 id:userId
               }
+            },
+            orderProducts:{
+             create:{
+              productId,
+              quantity
+             }
             }
           }
         })
         return newOrder
-      }
+    }
 
-
-      // checkk if orderProduct exist in order
-      const existingOrderProduct = order.orderProducts.find((orderItem)=>orderItem.productId===productId)
-      if(existingOrderProduct){
-        // update the quantity of the existing  order 
-        const updateOrderQuantity =await this.prisma.orderProduct.update({
-          where:{
-            id:existingOrderProduct.id
-          },
-          data:{
-            quantity:existingOrderProduct.quantity+quantity
-          }
-        })
-        return updateOrderQuantity
-      }
-      else{
-        const newOrderProduct=await this.prisma.orderProduct.create({
-          data:{
-            quantity,
-            order:{
-              connect:{
-                id:order.id
-              }
-            },
-            product:{
-              connect:{
-                id:productId
-              }
-            }
-          }
-        })
-        return {
-          message: 'Product added to order successfully',
-          newOrderProduct,
-        };
-      }
-      
-    } catch (error) {
+   catch (error) {
       throw new InternalServerErrorException(
         error.message || 'Failed to process the order',
       );
@@ -77,12 +49,16 @@ export class OrderService {
   
   }
 
+
+
   // order status  
-  async orderStatus(dto:OrderStatusDto ,userId:string){
+  async orderStatus(dto:OrderStatusDto ,userId:string,orderId){
     try {
       const order =await this.prisma.order.findFirst({
         where:{
-        userId
+         AND:[
+          {id:orderId},{userId:userId}
+         ]
         }
       })
       if(!order){
@@ -133,10 +109,9 @@ export class OrderService {
   async fetchOrder(userId:string,orderId:string){
     try {
       
-      const order =await this.prisma.order.findUnique({
+      const order =await this.prisma.order.findFirst({
         where:{
-          id:orderId,
-          userId:userId
+        AND:[{  id:orderId},{ userId:userId}]
         },
         include:{
           orderProducts:true
