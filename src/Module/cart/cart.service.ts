@@ -20,70 +20,55 @@ export class CartService {
     })
     // if the cart does not exist 
     if(!cart){
-      // create new Cart
+      // create new cart
       const newCart =await this.prisma.cart.create({
         data:{
           user:{
             connect:{
               id:userId
             }
-          }
-        }
-      })
-    }
-
-    // check if the product exist in the cart
-    const existingCartProduct = cart.cartProduct.find((cartItem)=>cartItem.productId===productId)
-    // if there is existing product then we update the quantity
-    if(existingCartProduct){
-     const cartProductUpdate =await this.prisma.cartProduct.update({
-      where:{
-        id:existingCartProduct.id
-      },data:{
-        quantity:existingCartProduct.quantity+quantity
-      }
-     })
-    }else{
-      return this.prisma.cartProduct.create({
-        data:{
-          quantity,
-          cart:{
-           connect:{
-             id:cart.id
-           }
-     
           },
-          product:{
-           connect:{
-             id:productId
-           }
+          cartProduct:{
+            create:{
+              productId,
+              quantity
+            }
           }
         }
       })
+     return newCart
     }
-
+    console.log("cart",cart)   
   } catch (error) {
-    throw new InternalServerErrorException(error)
+    throw new InternalServerErrorException(error.message|| 'Error creating a new cart')
   }
 
   }
 
-  // get all cartwith userId 
+  // get cart with userId 
 
-  async findCart(userId:string){
+  async findCart(cartId:string){
     try {
       const cart =await this.prisma.cart.findUnique({
         where:{
-          userId:userId
+          id:cartId
         },
         include:{
-          user:true
+          cartProduct:true
         }
       })
       return cart
     } catch (error) {
       throw new NotFoundException(error.message||"cart not found ") 
     }
+  }
+
+
+  // update the cart
+  async updateCart()=>{
+    
+
+    
   }
 
   //remove cart 

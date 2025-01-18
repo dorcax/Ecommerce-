@@ -13,9 +13,10 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
   Req,
-  Res} from '@nestjs/common';
+  Res,
+  Query} from '@nestjs/common';
 import { ProductService } from './product.service';
-import {  CreateProductDto } from './dto/create-product.dto';
+import {  CreateProductDto, PaginationDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-guard';
 import { RolesGuard } from '../auth/guards/role-guard';
@@ -45,14 +46,12 @@ export class ProductController {
     @Req() req
 
   ) {
-    const userId = req.user.sub;
-
+   
 
 
     return this.productService.createProduct(createProductDto,file,req);
   }
 
-  // category route
  
   // find all product
 
@@ -60,9 +59,16 @@ export class ProductController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   async findProducts(
-    @Req() req
+    @Req() req,
+    @Query() paginationDto:PaginationDto
+
   ){
-    return this.productService.findProducts(req);
+
+    
+    return this.productService.findProducts(req,
+    paginationDto
+
+    );
   }
   
   // find each product 
@@ -74,8 +80,8 @@ export class ProductController {
     @Req() req
   ){
 
-    const userId = req.user.payload.sub;
-    return this.productService.findProduct(productId,userId)
+    
+    return this.productService.findProduct(productId,req)
   }
 
   
@@ -83,8 +89,8 @@ export class ProductController {
 
   // update product
   @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Patch(':productId')
   @UseInterceptors(FileInterceptor('file'))
   update(
@@ -106,9 +112,10 @@ export class ProductController {
 
  
 // delete product
-@Roles(Role.USER,Role.ADMIN)
-@UseGuards(JwtAuthGuard)
+@Roles(Role.ADMIN)
 @UseGuards(RolesGuard)
+@UseGuards(JwtAuthGuard)
+
 @Delete(":productId")
 async deleteProduct(@Param("productId") productId:string,
 @Req() req){
@@ -122,5 +129,10 @@ async getStatistics(){
   return this.productService.getStatistics()
 }
 // get monthly sales 
-// @Roles(Role.ADMIN)
+@Roles(Role.ADMIN)
+@UseGuards(JwtAuthGuard,RolesGuard)
+@Get("monthlydata/sales")
+async getMonthlySales(){
+  return this.productService.getMonthlySales()
+}
 }

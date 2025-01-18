@@ -21,11 +21,12 @@ export class OrderController {
   }
     
   // update order status
-  @Roles(Role.USER)
+  @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard,RolesGuard)
-  @Patch(":userId")
+  @Patch(":userId/:orderId")
   updateOrderStatus(@Body() orderStatusDto: OrderStatusDto,
-          @Param("userId") userId:string) {
-    return this.orderService.orderStatus(orderStatusDto,userId);
+          @Param("userId") userId:string,
+        @Param("orderId") orderId:string) {
+    return this.orderService.orderStatus(orderStatusDto,userId,orderId);
   }
 }

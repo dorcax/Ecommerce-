@@ -1,15 +1,15 @@
-import { IsInt, IsNotEmpty, IsString } from "class-validator"
+import { IsInt, IsNotEmpty, IsString,IsOptional } from "class-validator"
 
 export class CreateCartDto {
     @IsString()
     @IsNotEmpty()
     userId:string
     
-    @IsInt()
+    @IsOptional()
     @IsNotEmpty()
-    quantity:number
+    quantity?:number
 
-    @IsString()
+    @IsOptional()
     @IsNotEmpty()
-    productId:string
+    productId?:string
 }
