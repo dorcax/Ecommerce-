@@ -1,17 +1,14 @@
 import { IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator"
 
 export class CreateOrderDto {
-    @IsString()
-    @IsNotEmpty()
-    userId:string
-    
-    @IsInt()
-    @IsNotEmpty()
-    quantity:number
     
     @IsNumber()
     @IsNotEmpty()
-    totalPrice:number
+    quantity:number
+    
+    // @IsNumber()
+    // @IsNotEmpty()
+    // totalPrice:number
 
     @IsString()
     @IsNotEmpty()
@@ -29,7 +26,7 @@ export class OrderStatusDto{
 
 export enum OrderStatus{
     PENDING = 'PENDING',
-    PROCESSING = 'PROCESSING',
+    CANCELLED = 'CANCELLED',
     SHIPPING = 'SHIPPING',
     DELIVERED = 'DELIVERED',
 }
